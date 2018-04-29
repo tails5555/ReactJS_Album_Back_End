@@ -44,6 +44,12 @@ public class PhotoService {
 		return tmp.toString();
 	}
 
+	public Photo findOne(long id) throws ServletException {
+		Photo photo = photoRepository.findById(id).orElse(null);
+		if(photo==null) throw new ServletException("존재하지 않는 사진 번호입니다.");
+		return photo;
+	}
+
 	@Async("threadPoolTaskExecutor")
 	public Future<String> photoUpload(MultipartFile[] photos, long albumId) throws InterruptedException, ServletException, IOException {
 		Album album = albumRepository.findById(albumId).orElse(null);
