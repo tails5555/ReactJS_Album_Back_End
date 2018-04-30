@@ -34,6 +34,15 @@ public class MainRestController {
 		return new ResponseEntity<List<Album>>(albumService.findAll(), HttpStatus.OK);
 	}
 
+	@GetMapping("album/{albumId}")
+	public ResponseEntity<Album> findOneAlbum(@PathVariable("albumId") long albumId){
+		Album album = albumService.findOne(albumId);
+		if(album!=null)
+			return new ResponseEntity<Album>(album, HttpStatus.OK);
+		else
+			return new ResponseEntity<Album>(new Album(), HttpStatus.NO_CONTENT);
+	}
+
 	@GetMapping("albumWithPhoto/{albumId}")
 	public ResponseEntity<List<Photo>> findByAlbumPhotos(@PathVariable("albumId") long albumId) throws InterruptedException, ExecutionException, ServletException{
 		List<Photo> photos = photoService.findByAlbumId(albumId).get();

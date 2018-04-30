@@ -14,4 +14,8 @@ public class AlbumService {
 	public List<Album> findAll(){
 		return albumRepository.findAll();
 	}
+	public Album findOne(long id) {
+		Album album = albumRepository.findById(id).orElse(null);
+		return album;
+	}
 }
