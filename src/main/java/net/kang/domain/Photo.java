@@ -5,6 +5,8 @@ import java.time.LocalDateTime;
 import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -24,6 +26,13 @@ public class Photo {
 	@GeneratedValue(strategy=GenerationType.IDENTITY)
 	long id;
 	String photoName;
+
+	@Column(name="photoTitle")
+	String title;
+
+	@Enumerated(EnumType.STRING)
+	@Column(name="photoSuffix")
+	Suffix suffix;
 
 	@Column(name="photoWidth")
 	int width;
