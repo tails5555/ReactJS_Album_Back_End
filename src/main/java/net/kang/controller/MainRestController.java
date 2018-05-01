@@ -80,9 +80,9 @@ public class MainRestController {
 		return new ResponseEntity<String>("No Found", HttpStatus.NO_CONTENT);
 	}
 
-	@PostMapping("album/{albumId}/upload")
-	public ResponseEntity<String> photoUpload(@RequestParam("files") MultipartFile[] files, @PathVariable("albumId") long albumId){
-		System.out.println(files.length);
+	@PostMapping(value="album/{albumId}/upload", consumes="multipart/form-data")
+	public ResponseEntity<String> photoUpload(@RequestParam("file") MultipartFile file, @PathVariable("albumId") long albumId){
+		// 파일은 하나 씩 보내는 방안으로 구상 중... 여러 파일을 한꺼번에 보내면 동기적인 비동기가 되어 의외로 안 좋은 생각인 듯 하여서...
 		return new ResponseEntity<String>("", HttpStatus.OK);
 	}
 }
