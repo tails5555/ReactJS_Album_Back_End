@@ -14,8 +14,11 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 import net.kang.domain.Album;
 import net.kang.domain.Photo;
@@ -75,5 +78,11 @@ public class MainRestController {
 			return new ResponseEntity<byte[]>(photo.getData(), headers, HttpStatus.OK);
 		}
 		return new ResponseEntity<String>("No Found", HttpStatus.NO_CONTENT);
+	}
+
+	@PostMapping("album/{albumId}/upload")
+	public ResponseEntity<String> photoUpload(@RequestParam("files") MultipartFile[] files, @PathVariable("albumId") long albumId){
+		System.out.println(files.length);
+		return new ResponseEntity<String>("", HttpStatus.OK);
 	}
 }
