@@ -19,13 +19,24 @@ public class SpringAsyncConfig {
 	protected Logger logger = LoggerFactory.getLogger(getClass());
     protected Logger errorLogger = LoggerFactory.getLogger("error");
 
-	@Bean(name="threadPoolTaskExecutor")
+	@Bean(name="photoFileUploadExecutor")
 	public Executor threadPoolTaskExecutor() {
 		ThreadPoolTaskExecutor taskExecutor = new ThreadPoolTaskExecutor();
 		taskExecutor.setCorePoolSize(3);
 		taskExecutor.setMaxPoolSize(30);
 		taskExecutor.setQueueCapacity(10);
-		taskExecutor.setThreadNamePrefix("Executor-");
+		taskExecutor.setThreadNamePrefix("UploadExecutor-");
+		taskExecutor.initialize();
+		return new HandlingExecutor(taskExecutor);
+	}
+
+	@Bean(name="photoNameEncoderExecutor")
+	public Executor photoNameEncoderExecutor() {
+		ThreadPoolTaskExecutor taskExecutor = new ThreadPoolTaskExecutor();
+		taskExecutor.setCorePoolSize(3);
+		taskExecutor.setMaxPoolSize(30);
+		taskExecutor.setQueueCapacity(10);
+		taskExecutor.setThreadNamePrefix("EncoderExecutor-");
 		taskExecutor.initialize();
 		return new HandlingExecutor(taskExecutor);
 	}

@@ -45,7 +45,7 @@ public class MainRestController {
 
 	@GetMapping("albumWithPhoto/{albumId}")
 	public ResponseEntity<List<Photo>> findByAlbumPhotos(@PathVariable("albumId") long albumId) throws InterruptedException, ExecutionException, ServletException{
-		List<Photo> photos = photoService.findByAlbumId(albumId).get();
+		List<Photo> photos = photoService.findByAlbumId(albumId);
 		if(photos.size()>0) {
 			return new ResponseEntity<List<Photo>>(photos, HttpStatus.OK);
 		}else {
@@ -58,21 +58,18 @@ public class MainRestController {
 		Photo photo = photoService.findOne(id);
 		if(photo!=null) {
 			HttpHeaders headers = new HttpHeaders();
-			int infix=photo.getPhotoName().lastIndexOf('.');
-			String photoPrefix = photo.getPhotoName().substring(infix + 1);
-			photoPrefix.toLowerCase();
-			switch(photoPrefix) {
-				case "jpg" :
+			switch(photo.getSuffix()) {
+				case JPEG :
 					headers.setContentType(MediaType.IMAGE_JPEG);
 					break;
-				case "jpeg" :
+				case JPG :
 					headers.setContentType(MediaType.IMAGE_JPEG);
 					break;
-				case "png" :
+				case PNG :
 					headers.setContentType(MediaType.IMAGE_PNG);
 					break;
-				default :
-					headers.setContentType(MediaType.IMAGE_JPEG);
+				case GIF :
+					headers.setContentType(MediaType.IMAGE_GIF);
 					break;
 			}
 			return new ResponseEntity<byte[]>(photo.getData(), headers, HttpStatus.OK);

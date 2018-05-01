@@ -21,6 +21,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import net.kang.domain.Album;
 import net.kang.domain.Photo;
+import net.kang.domain.Suffix;
 import net.kang.repository.AlbumRepository;
 import net.kang.repository.PhotoRepository;
 import net.kang.util.Encryption;
@@ -31,26 +32,23 @@ public class PhotoService {
 	@Autowired PhotoRepository photoRepository;
 	@Autowired AlbumRepository albumRepository;
 
-	public String fileNameEncryption(String fileName) {
-		String[] file = fileName.split("."); // .을 통해서 파일 이름과 확장자를 구분시킨다.
-		StringBuilder tmp = new StringBuilder();
-		for(int k=0;k<file.length-1;k++) {
-			tmp.append(Encryption.encrypt(file[k], Encryption.SHA256)); // 파일 이름을 암호화 설정한다.
-			if(k!=file.length-1) {
-				tmp.append("."); // 간혹 파일 이름 중에 .이 존재하는 경우(JavaScript의 경우), 이를 포함시켜 주도록 한다.
-			}
-		}
-		tmp.append(file[file.length-1]); // 확장자는 그대로 설정한다.
-		return tmp.toString();
-	}
-
 	public Photo findOne(long id) throws ServletException {
 		Photo photo = photoRepository.findById(id).orElse(null);
 		if(photo==null) throw new ServletException("존재하지 않는 사진 번호입니다.");
 		return photo;
 	}
 
-	@Async("threadPoolTaskExecutor")
+	@Async("photoNameEncoderExecutor") // 각 파일 별로 암호화를 하기 위한 비동기 주체를 통해 변환을 도와준다.
+	public String fileNameEncryption(String fileName) throws InterruptedException {
+		int infix=fileName.lastIndexOf('.'); // .을 이용해 파일 이름과 확장자를 구분한다.
+		String fileSuffix = fileName.substring(infix, fileName.length()); // 확장자를 가져와서 붙인다.
+		String filePrefix = Encryption.encrypt(fileName.substring(0, infix-1), Encryption.SHA256); // 파일 이름에 대해 SHA256 암호화 알고리즘을 이용해서 암호화를 진행한다.
+
+		Thread.sleep(1000L); // 비동기에 대해 겹치지 않도록 1초 간격으로 쉬도록 한다.
+		return filePrefix + fileSuffix;
+	}
+
+	@Async("photoFileUploadExecutor")
 	public Future<String> photoUpload(MultipartFile[] photos, long albumId) throws InterruptedException, ServletException, IOException {
 		Album album = albumRepository.findById(albumId).orElse(null);
 		if(album==null) throw new ServletException("존재하지 않는 앨범 번호입니다.");
@@ -58,32 +56,36 @@ public class PhotoService {
 			if(file.getSize()<=0) continue;
 			BufferedImage bufferedImage = ImageIO.read(file.getInputStream());
 			String name = Paths.get(file.getOriginalFilename()).getFileName().toString();
+			int infix=name.lastIndexOf('.'); // .을 이용해 파일 이름과 확장자를 구분한다.
+			String filePrefix = name.substring(0, infix); // 파일 이름을 파일 제목으로 지정한다.
+			String fileSuffix = name.substring(infix+1, name.length()); // 확장자를 가져 온다.
 			log.info("Uploading Photo : {}", name);
 			Photo photo = new Photo();
-			photo.setPhotoName(this.fileNameEncryption(name));
-			photo.setHeight(bufferedImage.getHeight());
-			photo.setWidth(bufferedImage.getWidth());
-			photo.setSize(file.getSize());
-			photo.setUploadTime(LocalDateTime.now());
-			photo.setData(file.getBytes());
-			photo.setAlbum(album);
-			photoRepository.save(photo);
+			photo.setTitle(filePrefix); // 파일 제목에 대해 설정한다.
+			photo.setSuffix(Suffix.valueOf(fileSuffix.toUpperCase())); // 파일 확장자에 대해 Enum을 통해 가져온다.
+			photo.setPhotoName(this.fileNameEncryption(name)); // 사진 이름을 암호화하여 설정한다.
+			photo.setHeight(bufferedImage.getHeight()); // 사진의 높이에 대해 지정한다.
+			photo.setWidth(bufferedImage.getWidth()); // 사진의 너비에 대해 지정한다.
+			photo.setSize(file.getSize()); // 사진의 용량을 저장한다.
+			photo.setUploadTime(LocalDateTime.now()); // 업로드 시간을 현재로 지정한다.
+			photo.setData(file.getBytes()); // 파일의 binary file을 가져와서 저장한다.
+			photo.setAlbum(album); // 앨범은 앨범 번호를 통해 검색된 앨범으로 저장을 한다.
+			photoRepository.save(photo); // 사진에 대해 저장을 한다.
 			log.info("Uploading Photo is Successed!!! : {}", name);
 		}
-		Thread.sleep(2000L);
+		Thread.sleep(2000L); // 비동기에 대해 겹치지 않도록 하기 위해 2초 간격으로 휴식을 한다.
 		return new AsyncResult<String>("Uploading Photos is Completed.");
 	}
 
-	@Async("threadPoolTaskExecutor")
-	public Future<List<Photo>> findByAlbumId(long albumId) throws ServletException{
+	public List<Photo> findByAlbumId(long albumId) throws ServletException{
 		Album album = albumRepository.findById(albumId).orElse(null);
 		if(album==null) throw new ServletException("존재하지 않는 앨범 번호입니다.");
 		log.info("Finding By Photo in Album : {}", album.getName());
 		List<Photo> result = photoRepository.findByAlbum(album);
 		if(result.size()>0) {
 			log.info("Finding By Photo in Album Success : {}", album.getName());
-			return new AsyncResult<List<Photo>>(result);
+			return result;
 		}
-		return new AsyncResult<List<Photo>>(new ArrayList<Photo>());
+		return new ArrayList<Photo>();
 	}
 }

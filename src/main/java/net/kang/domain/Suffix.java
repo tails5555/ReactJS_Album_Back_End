@@ -1,10 +1,10 @@
 package net.kang.domain;
 
 public enum Suffix {
-	JPEG("jpeg"),
-	JPG("jpg"),
-	PNG("png"),
-	GIF("gif");
+	JPEG("JPEG"),
+	JPG("JPG"),
+	PNG("PNG"),
+	GIF("GIF");
 
 	private String suffix;
 
