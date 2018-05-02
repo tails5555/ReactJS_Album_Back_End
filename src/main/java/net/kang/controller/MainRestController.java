@@ -1,6 +1,7 @@
 package net.kang.controller;
 
 import java.io.IOException;
+import java.io.OutputStream;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
@@ -32,11 +33,13 @@ public class MainRestController {
 	@Autowired PhotoService photoService;
 	@Autowired AlbumService albumService;
 
+	// 앨범 목록에 대해서 AJAX를 통해 일반적으로 가져올 때 쓴다.
 	@GetMapping("albumList")
 	public ResponseEntity<List<Album>> findAllAlbum(){
 		return new ResponseEntity<List<Album>>(albumService.findAll(), HttpStatus.OK);
 	}
 
+	// Client에서 앨범을 선택하면 이를 탐색해서 앨범 정보를 반환한다.
 	@GetMapping("album/{albumId}")
 	public ResponseEntity<Album> findOneAlbum(@PathVariable("albumId") long albumId){
 		Album album = albumService.findOne(albumId);
@@ -46,6 +49,7 @@ public class MainRestController {
 			return new ResponseEntity<Album>(new Album(), HttpStatus.NO_CONTENT);
 	}
 
+	// 앨범에 있는 사진 목록들에 대해서 AJAX를 통해 오로지 사진의 정보만 가져올 때 쓴다. albumId은 Client에서 앨범을 선택하면 보내지는 값으로 앨범을 검색할 때 쓴다.
 	@GetMapping("albumWithPhoto/{albumId}")
 	public ResponseEntity<List<Photo>> findByAlbumPhotos(@PathVariable("albumId") long albumId) throws InterruptedException, ExecutionException, ServletException{
 		List<Photo> photos = photoService.findByAlbumId(albumId);
@@ -56,6 +60,7 @@ public class MainRestController {
 		}
 	}
 
+	// photoId를 통해서 Photo 테이블에 들어 있는 사진 데이터에 대한 정보를 얻어와서 이를 BLOB에 저장된 데이터를 통해서 이미지를 보여준다.
 	@GetMapping("photo/{photoId}")
 	public ResponseEntity<?> photoView(@PathVariable("photoId") long id) throws ServletException, IOException {
 		Photo photo = photoService.findOne(id);
@@ -80,9 +85,20 @@ public class MainRestController {
 		return new ResponseEntity<String>("No Found", HttpStatus.NO_CONTENT);
 	}
 
+	// 실제로 사진 하나 씩 업로딩을 하는 과정을 볼 수 있다. 본래 한 앨범에 여러 사진들을 업로드하든, 각 한 사진 씩 업로드하든 성능 차이는 크게 없기 때문에 이를 기반으로 작성하였다.
 	@PostMapping(value="album/{albumId}/upload", consumes="multipart/form-data")
-	public ResponseEntity<String> photoUpload(@RequestParam("file") MultipartFile file, @PathVariable("albumId") long albumId){
-		// 파일은 하나 씩 보내는 방안으로 구상 중... 여러 파일을 한꺼번에 보내면 동기적인 비동기가 되어 의외로 안 좋은 생각인 듯 하여서...
-		return new ResponseEntity<String>("", HttpStatus.OK);
+	public ResponseEntity<String> photoUpload(@RequestParam("file") MultipartFile file, @PathVariable("albumId") long albumId, OutputStream os){
+		try {
+			photoService.photoUpload(file, albumId, file.getBytes());
+		} catch (InterruptedException e) { // 비동기에서 흔히 발생할 수 있는 인터럽트에 대해 예외 처리를 한다.
+			return new ResponseEntity<String>("INTERRUPTED_ERROR", HttpStatus.INTERNAL_SERVER_ERROR);
+		} catch (ServletException e) { // 논리적 오류에 대해서 예외 처리를 한다.
+			return new ResponseEntity<String>("SERVLET_ERROR", HttpStatus.BAD_REQUEST);
+		} catch (IOException e) { // Photo Input, Output 중 문제 발생에 대해 예외 처리한다.
+			return new ResponseEntity<String>("IO_ERROR", HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+		return new ResponseEntity<String>("UPLOAD_COMPLETE", HttpStatus.OK);
 	}
+
+	// 아래에는 사진 업로드가 진행되면서 Progress Bar에 대해 구현을 할 수도 있음.
 }

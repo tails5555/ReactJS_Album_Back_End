@@ -15,10 +15,11 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 @Configuration
 @EnableAsync
 public class SpringAsyncConfig {
-
+	// 비동기 주체를 가진 Bean에 대해서 각 동작들에 대해 인터럽트 발생을 Log를 이용해서 확인을 한다.
 	protected Logger logger = LoggerFactory.getLogger(getClass());
     protected Logger errorLogger = LoggerFactory.getLogger("error");
 
+    // 이 비동기 주체는 사용자가 파일을 업로드할 때 비동기로 받아서 Executor01, Executor02, Executor03 대로 순회를 돌면서 실행을 한다.
 	@Bean(name="photoFileUploadExecutor")
 	public Executor threadPoolTaskExecutor() {
 		ThreadPoolTaskExecutor taskExecutor = new ThreadPoolTaskExecutor();
@@ -30,17 +31,7 @@ public class SpringAsyncConfig {
 		return new HandlingExecutor(taskExecutor);
 	}
 
-	@Bean(name="photoNameEncoderExecutor")
-	public Executor photoNameEncoderExecutor() {
-		ThreadPoolTaskExecutor taskExecutor = new ThreadPoolTaskExecutor();
-		taskExecutor.setCorePoolSize(3);
-		taskExecutor.setMaxPoolSize(30);
-		taskExecutor.setQueueCapacity(10);
-		taskExecutor.setThreadNamePrefix("EncoderExecutor-");
-		taskExecutor.initialize();
-		return new HandlingExecutor(taskExecutor);
-	}
-
+	// HandlingExecutor 클래스는 Async(비동기)의 주체가 동작을 할 때 필요한 Handler이다.
 	public class HandlingExecutor implements AsyncTaskExecutor{
 		private AsyncTaskExecutor executor;
 		public HandlingExecutor(AsyncTaskExecutor executor) {
