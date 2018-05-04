@@ -60,7 +60,7 @@ public class PhotoService {
 		}
 
 		// 2단계. 파일의 Size가 0이거나 오류가 있는 파일에 대해서는 종료를 한다.
-		if(file.getSize()<=0) return;
+		if(fileByte.length<=0) return;
 
 		// 3단계. 각 그림 파일에 대해 byte 배열을 받아서 BufferedImage를 이용해서 그림을 가져와 그림의 높낮이를 가져올 때 쓴다.
 		// Java7 Ver에서 발표된 Try-With-Resource 예외기법을 이용하면 ByteArrayInputStream 객체에 대해서 입출력이 완수된다면 알아서 close()를 해주기 때문에 예외를 확실하게 처리할 수 있다.
@@ -82,7 +82,7 @@ public class PhotoService {
 			photo.setPhotoName(this.fileNameEncryption(name)); // 사진 이름을 암호화하여 설정한다.
 			photo.setHeight(bufferedImage.getHeight()); // 사진의 높이에 대해 지정한다.
 			photo.setWidth(bufferedImage.getWidth()); // 사진의 너비에 대해 지정한다.
-			photo.setSize(file.getSize()); // 사진의 용량을 저장한다. 단위는 Byte이다.
+			photo.setSize((long) fileByte.length); // 사진의 용량을 저장한다. 단위는 Byte이다.
 			photo.setUploadTime(LocalDateTime.now()); // 업로드 시간을 현재로 지정한다.
 			photo.setData(fileByte); // 파일의 binary file을 가져와서 저장한다.
 			photo.setAlbum(album); // 앨범은 앨범 번호를 통해 검색된 앨범으로 저장을 한다.
