@@ -19,8 +19,11 @@ public class Album {
 	@Id
 	@GeneratedValue(strategy=GenerationType.IDENTITY)
 	long id;
+
+	// 앨범 이름
 	String name;
 
+	// 앨범 내부에 있는 사진 목록들. 이는 OneToMany로 많이 안 쓰이기 때문에 LAZY 정책으로 설정하였다.
 	@JsonIgnore
 	@OneToMany(mappedBy="album", fetch=FetchType.LAZY)
 	List<Photo> photoes;
