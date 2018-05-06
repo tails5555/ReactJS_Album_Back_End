@@ -21,12 +21,24 @@ public class SpringAsyncConfig {
 
     // 이 비동기 주체는 사용자가 파일을 업로드할 때 비동기로 받아서 Executor01, Executor02, Executor03 대로 순회를 돌면서 실행을 한다.
 	@Bean(name="photoFileUploadExecutor")
-	public Executor threadPoolTaskExecutor() {
+	public Executor photoFileUploadExecutor() {
 		ThreadPoolTaskExecutor taskExecutor = new ThreadPoolTaskExecutor();
 		taskExecutor.setCorePoolSize(3);
 		taskExecutor.setMaxPoolSize(30);
 		taskExecutor.setQueueCapacity(10);
 		taskExecutor.setThreadNamePrefix("UploadExecutor-");
+		taskExecutor.initialize();
+		return new HandlingExecutor(taskExecutor);
+	}
+
+	// 이 비동기 주체는 사용자가 파일을 삭제할 때 비동기로 받아서 Executor01, Executor02, Executor03 대로 순회를 돌면서 실행을 한다.
+	@Bean(name="photoDeleteExecutor")
+	public Executor photoDeleteExecutor() {
+		ThreadPoolTaskExecutor taskExecutor = new ThreadPoolTaskExecutor();
+		taskExecutor.setCorePoolSize(3);
+		taskExecutor.setMaxPoolSize(30);
+		taskExecutor.setQueueCapacity(10);
+		taskExecutor.setThreadNamePrefix("DeleteExecutor-");
 		taskExecutor.initialize();
 		return new HandlingExecutor(taskExecutor);
 	}

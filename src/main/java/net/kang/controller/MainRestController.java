@@ -2,6 +2,7 @@ package net.kang.controller;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
@@ -13,9 +14,11 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -61,7 +64,7 @@ public class MainRestController {
 	}
 
 	// photoId를 통해서 Photo 테이블에 들어 있는 사진 데이터에 대한 정보를 얻어와서 이를 BLOB에 저장된 데이터를 통해서 이미지를 보여준다.
-	@GetMapping("photo/{photoId}")
+	@GetMapping("photo/view/{photoId}")
 	public ResponseEntity<?> photoView(@PathVariable("photoId") long id) throws ServletException, IOException {
 		Photo photo = photoService.findOne(id);
 		if(photo!=null) {
@@ -100,5 +103,19 @@ public class MainRestController {
 		return new ResponseEntity<String>("UPLOAD_COMPLETE", HttpStatus.OK);
 	}
 
+	// 앨범 목록에서 각 사진에 있는 자세히 버튼을 클릭하는 경우에 한 사진의 정보를 가져와서 보여준다.
+	@GetMapping(value="photo/info/{photoId}")
+	public ResponseEntity<Photo> findOnePhoto(@PathVariable("photoId") long photoId) throws ServletException{
+		Photo photo = photoService.findOne(photoId);
+		if(photo!=null) return new ResponseEntity<Photo>(photo, HttpStatus.OK);
+		else return new ResponseEntity<Photo>(photo, HttpStatus.NO_CONTENT);
+	}
+
+	// 여러 사진들에 대해서 삭제를 할 때 사진 ID를 가져와서 비동기적으로 삭제를 진행을 하게 된다.
+	@DeleteMapping(value="album/{albumId}/delete")
+	public ResponseEntity<String> photoDelete(@PathVariable("albumId") long albumId, @RequestBody long[] fileIndexes){
+		System.out.println(Arrays.toString(fileIndexes));
+		return new ResponseEntity<String>("FILE_DELETE_COMPLETE", HttpStatus.OK);
+	}
 	// 아래에는 사진 업로드가 진행되면서 Progress Bar에 대해 구현을 할 수도 있음.
 }
