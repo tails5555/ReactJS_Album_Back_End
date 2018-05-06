@@ -2,7 +2,6 @@ package net.kang.controller;
 
 import java.io.IOException;
 import java.io.OutputStream;
-import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
@@ -111,11 +110,19 @@ public class MainRestController {
 		else return new ResponseEntity<Photo>(photo, HttpStatus.NO_CONTENT);
 	}
 
-	// 여러 사진들에 대해서 삭제를 할 때 사진 ID를 가져와서 비동기적으로 삭제를 진행을 하게 된다.
-	@DeleteMapping(value="album/{albumId}/delete")
-	public ResponseEntity<String> photoDelete(@PathVariable("albumId") long albumId, @RequestBody long[] fileIndexes){
-		System.out.println(Arrays.toString(fileIndexes));
-		return new ResponseEntity<String>("FILE_DELETE_COMPLETE", HttpStatus.OK);
+	// 한 사진에 대해서 삭제를 할 때 사진 ID를 가져와서 비동기적으로 삭제를 진행하게 된다.
+	@DeleteMapping(value="photo/delete/{photoId}")
+	public ResponseEntity<String> deleteById(@PathVariable("photoId") long photoId) throws InterruptedException{
+		photoService.deleteById(photoId);
+		return new ResponseEntity<String>("DELETE_COMPLETE", HttpStatus.OK);
 	}
+
+	// 여러 사진들에 대해서 삭제를 할 때 사진 ID들을 가져와서 비동기적으로 삭제를 진행을 하게 된다.
+	@DeleteMapping(value="photo/deleteByIndexes")
+	public ResponseEntity<String> photoDelete(@RequestBody List<Long> fileIndexes) throws InterruptedException{
+		photoService.deleteByIndexes(fileIndexes);
+		return new ResponseEntity<String>("PHOTOS_DELETE_COMPLETE", HttpStatus.OK);
+	}
+
 	// 아래에는 사진 업로드가 진행되면서 Progress Bar에 대해 구현을 할 수도 있음.
 }

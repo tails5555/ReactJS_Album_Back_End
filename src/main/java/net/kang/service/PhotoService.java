@@ -9,6 +9,7 @@ import java.util.List;
 
 import javax.imageio.ImageIO;
 import javax.servlet.ServletException;
+import javax.transaction.Transactional;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -50,6 +51,7 @@ public class PhotoService {
 
 	// 그림 파일의 데이터를 1개씩 받아서 각각 저장을 시키는 역할을 한다.
 	@Async("photoFileUploadExecutor")
+	@Transactional
 	public void photoUpload(MultipartFile file, long albumId, byte[] fileByte) throws InterruptedException, ServletException, IOException {
 		// 1단계. albumId를 이용해서 앨범의 존재 여부를 확인한다.
 		log.info("Finding Album By Id : {}", albumId);
@@ -82,7 +84,7 @@ public class PhotoService {
 			photo.setPhotoName(this.fileNameEncryption(name)); // 사진 이름을 암호화하여 설정한다.
 			photo.setHeight(bufferedImage.getHeight()); // 사진의 높이에 대해 지정한다.
 			photo.setWidth(bufferedImage.getWidth()); // 사진의 너비에 대해 지정한다.
-			photo.setSize((long) fileByte.length); // 사진의 용량을 저장한다. 단위는 Byte이다.
+			photo.setSize(fileByte.length); // 사진의 용량을 저장한다. 단위는 Byte이다.
 			photo.setUploadTime(LocalDateTime.now()); // 업로드 시간을 현재로 지정한다.
 			photo.setData(fileByte); // 파일의 binary file을 가져와서 저장한다.
 			photo.setAlbum(album); // 앨범은 앨범 번호를 통해 검색된 앨범으로 저장을 한다.
@@ -107,5 +109,25 @@ public class PhotoService {
 			return result;
 		}
 		return new ArrayList<Photo>();
+	}
+
+	@Async("photoDeleteExecutor")
+	@Transactional
+	public void deleteById(long photoId) throws InterruptedException {
+		log.info("Delete By Photo ID : {}", photoId);
+		photoRepository.deleteById(photoId);
+		log.info("Delete By Photo ID Complete : {}", photoId);
+
+		Thread.sleep(1000L); // 비동기에 대해 겹치지 않도록 하기 위해 2초 간격으로 휴식을 한다.
+	}
+
+	@Async("photoDeleteExecutor")
+	@Transactional
+	public void deleteByIndexes(List<Long> selectIndexes) throws InterruptedException{
+		log.info("Delete By Select Indexes : {}", selectIndexes);
+		photoRepository.deleteByIdIn(selectIndexes);
+		log.info("Delete By Select Indexes Complete : {}", selectIndexes);
+
+		Thread.sleep(2000L);
 	}
 }

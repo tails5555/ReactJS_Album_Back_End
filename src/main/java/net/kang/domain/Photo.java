@@ -61,7 +61,6 @@ public class Photo {
 	byte[] data;
 
 	// 사진이 저장된 앨범 공간
-	@JsonIgnore
 	@ManyToOne
 	@JoinColumn(name="albumId")
 	Album album;

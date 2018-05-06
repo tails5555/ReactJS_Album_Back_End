@@ -9,4 +9,5 @@ import net.kang.domain.Photo;
 
 public interface PhotoRepository extends JpaRepository<Photo, Long>{
 	List<Photo> findByAlbum(Album album);
+	void deleteByIdIn(List<Long> ids);
 }
