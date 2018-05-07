@@ -29,8 +29,6 @@ RDBMS는 `MySQL`를 이용하였습니다. 각 객체 내부의 멤버 변수의
 - src > main > resources > application.properties에 현존하는 설정을 아래와 같은 방식으로 작성해서 이용하시면 됩니다.
 
 ```
-spring.mvc.view.prefix=[MVC에서 View 위치에 대한 설정]
-spring.mvc.view.suffix=[MVC에서 View 확장자 설정]
 spring.datasource.driver-class-name=[JDBC 이용 클래스 이름 입력]
 spring.datasource.url=[JDBC와 연동하기 위한 URL]
 spring.datasource.username=[DB 사용자 이름]
