@@ -16,6 +16,32 @@ RDBMS는 `MySQL`를 이용하였습니다. 각 객체 내부의 멤버 변수의
 > - [Album 클래스 참조](https://github.com/tails5555/ReactJS_Album_Back_End/blob/master/src/main/java/net/kang/domain/Album.java)
 > - [Photo 클래스 참조](https://github.com/tails5555/ReactJS_Album_Back_End/blob/master/src/main/java/net/kang/domain/Photo.java)
 
+
+## Asynchronous Structure
+
+![asynchronous_structure](/src/docs/asynchronous_structure.png "asynchronous_structure")
+
+- 비동기 작업들은 **사진에 대해 업로딩하는 작업**과 **사진 단일/복수 삭제 작업**으로 구상하였습니다.
+- Client Server에서는 비동기 작업에 대해 완료가 된다면 Message를 보내서 Client 내부에서 Redirect가 이뤄지도록 구상을 할 수 있습니다.
+
+## application.properties 설정
+- src > main > resources > application.properties에 현존하는 설정을 아래와 같은 방식으로 작성해서 이용하시면 됩니다.
+
+```
+spring.mvc.view.prefix=[MVC에서 View 위치에 대한 설정]
+spring.mvc.view.suffix=[MVC에서 View 확장자 설정]
+spring.datasource.driver-class-name=[JDBC 이용 클래스 이름 입력]
+spring.datasource.url=[JDBC와 연동하기 위한 URL]
+spring.datasource.username=[DB 사용자 이름]
+spring.datasource.password=[DB 사용자 비밀번호]
+<--! Hibernate JPA를 적용하기 위한 설정 -->
+spring.jpa.hibernate.naming.physical-strategy=org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
+<--! Spring Boot에서 각 MultipartFile에 대해 다운로드 받을 수 있는 최대 크기를 설정시켜야 한다. -->
+spring.servlet.multipart.max-file-size=2MB
+<--! Spring Boot에서 각 MultipartFile에 대해 업로드 할 수 있는 최대 크기를 설정시켜야 한다. -->
+spring.servlet.multipart.max-request-size=2MB
+```
+
 ## Maven pom.xml
 `pom.xml` 를 기반으로 Maven Dependency를 구성하여 Update Maven은 필수입니다
 
