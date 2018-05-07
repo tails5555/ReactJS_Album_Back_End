@@ -23,6 +23,7 @@ RDBMS는 `MySQL`를 이용하였습니다. 각 객체 내부의 멤버 변수의
 
 - 비동기 작업들은 **사진에 대해 업로딩하는 작업**과 **사진 단일/복수 삭제 작업**으로 구상하였습니다.
 - Client Server에서는 비동기 작업에 대해 완료가 된다면 Message를 보내서 Client 내부에서 Redirect가 이뤄지도록 구상을 할 수 있습니다.
+- 비동기 작업들이 이뤄지는 방법에 대해서는 [PhotoService.java](https://github.com/tails5555/ReactJS_Album_Back_End/blob/master/src/main/java/net/kang/service/PhotoService.java)를 참고하시면 좋습니다.
 
 ## application.properties 설정
 - src > main > resources > application.properties에 현존하는 설정을 아래와 같은 방식으로 작성해서 이용하시면 됩니다.
@@ -84,3 +85,10 @@ spring.servlet.multipart.max-request-size=2MB
 	</dependency>
 </dependencies>
 ```
+
+## Client Side Reference
+- Client Side는 `ReactJS`를 기반으로 작성을 하였으며, Screenshot은 아래 `README.md`에 올리겠습니다.
+- [ReactJS Client 참조하기](https://github.com/tails5555/ReactJS_Album_Front_End)
+
+## Author
+- [강인성](https://github.com/tails5555)
