@@ -43,7 +43,7 @@ public class SpringAsyncConfig {
 		return new HandlingExecutor(taskExecutor);
 	}
 
-	// HandlingExecutor 클래스는 Async(비동기)의 주체가 동작을 할 때 필요한 Executor의 골격체의 일부 구현인데 이는 추후에 필요한 조건에 맞춰서 작성을 할 필요가 있다.
+	// HandlingExecutor 클래스는 Async(비동기)의 주체가 동작을 할 때 필요한 Executor의 골격체의 일부 구현인데 이는 나중에 필요한 조건에 맞춰서 작성을 할 필요가 있다.
 	public class HandlingExecutor implements AsyncTaskExecutor{
 		private AsyncTaskExecutor executor;
 		public HandlingExecutor(AsyncTaskExecutor executor) {

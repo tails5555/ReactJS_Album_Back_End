@@ -16,6 +16,7 @@ import lombok.Data;
 @Data
 @Entity
 public class Album {
+	// id 값은 Primary Key로 적용한다.
 	@Id
 	@GeneratedValue(strategy=GenerationType.IDENTITY)
 	long id;

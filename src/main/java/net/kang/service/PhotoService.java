@@ -111,6 +111,7 @@ public class PhotoService {
 		return new ArrayList<Photo>();
 	}
 
+	// 단일 파일 삭제에 대해 비동기 작업으로 진행한다.
 	@Async("photoDeleteExecutor")
 	@Transactional
 	public void deleteById(long photoId) throws InterruptedException {
@@ -118,9 +119,10 @@ public class PhotoService {
 		photoRepository.deleteById(photoId);
 		log.info("Delete By Photo ID Complete : {}", photoId);
 
-		Thread.sleep(1000L); // 비동기에 대해 겹치지 않도록 하기 위해 2초 간격으로 휴식을 한다.
+		Thread.sleep(1000L); // 비동기에 대해 겹치지 않도록 하기 위해 1초 간격으로 휴식을 한다.
 	}
 
+	// 복수 파일 삭제에 대해 비동기 작업으로 진행한다.
 	@Async("photoDeleteExecutor")
 	@Transactional
 	public void deleteByIndexes(List<Long> selectIndexes) throws InterruptedException{
@@ -128,6 +130,6 @@ public class PhotoService {
 		photoRepository.deleteByIdIn(selectIndexes);
 		log.info("Delete By Select Indexes Complete : {}", selectIndexes);
 
-		Thread.sleep(2000L);
+		Thread.sleep(2000L); // 비동기에 대해 겹치지 않도록 하기 위해 2초 간격으로 휴식을 한다.
 	}
 }
