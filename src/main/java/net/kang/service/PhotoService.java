@@ -39,13 +39,12 @@ public class PhotoService {
 	}
 
 	// 각 파일 이름에 대해 암호화를 하여 반환을 하는 함수이다. 매개변수는 파일 이름이다.
-	public String fileNameEncryption(String fileName) throws InterruptedException {
+	public String fileNameEncryption(String fileName) {
 		int infix=fileName.lastIndexOf('.'); // .을 이용해 파일 이름과 확장자를 구분한다.
 
 		String fileSuffix = fileName.substring(infix, fileName.length()); // 확장자를 가져와서 붙인다.
 		String filePrefix = Encryption.encrypt(fileName.substring(0, infix-1), Encryption.SHA256); // 파일 이름에 대해 SHA256 암호화 알고리즘을 이용해서 암호화를 진행한다.
 
-		Thread.sleep(1000L); // 비동기에 대해 겹치지 않도록 1초 간격으로 쉬도록 한다.
 		return filePrefix + fileSuffix;
 	}
 
